@@ -1,3 +1,7 @@
+This is a modded version of the repo below. It has nothing to do with the original author.
+-----------------
+
+
 HTML5-Minesweeper
 -----------------
 
