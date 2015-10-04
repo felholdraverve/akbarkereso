@@ -7,6 +7,28 @@ $(function(){
 // --- Global & Default Variables ---
 /* =========================================== */
 
+var muslims = new Array(4);
+muslims[0] = new Image();
+muslims[0].src = 'images/muslim0.png';
+muslims[1] = new Image();
+muslims[1].src = 'images/muslim1.png';
+muslims[2] = new Image();
+muslims[2].src = 'images/muslim2.png';
+muslims[3] = new Image();
+muslims[3].src = 'images/muslim3.png';
+muslims[4] = new Image();
+muslims[4].src = 'images/muslim4.png';
+muslims[5] = new Image();
+muslims[5].src = 'images/muslim5.png';
+muslims[6] = new Image();
+muslims[6].src = 'images/muslim6.png';
+muslims[7] = new Image();
+muslims[7].src = 'images/muslim1.png';
+muslims[8] = new Image();
+muslims[8].src = 'images/muslim2.png';
+muslims[9] = new Image();
+muslims[9].src = 'images/muslim3.png';
+
 var globals = {
   firstClick: true,
   gameover: false,
@@ -23,12 +45,13 @@ var globals = {
   currentAnimation: '',
   previous: new Array(2),
   squaresX: '',
-  squaresY: ''
+  squaresY: '',
+  muslimTypes: []
 },
 
 defaults = {
   difficulty: 0,
-  celSize: 20,
+  celSize: 40,
   width: 400,
   height: 400,
   background: 'white',
@@ -60,6 +83,7 @@ var core = {
   init: function(){
     globals.canvas = $('#board');
     globals.context = globals.canvas[0].getContext("2d");
+
     globals.context.background = defaults.background;
 
     var ratio = this.hiDPIRatio();
@@ -102,6 +126,16 @@ var core = {
     
     var difarr = { 9: containers.easy, 6: containers.medium, 3: containers.insane};
     
+    // Count the number of flagged mines 
+    for (var x = 0; x <= globals.squaresX; x++){
+      globals.muslimTypes.push(new Array(globals.squaresY + 1));
+      for (var y = 0; y <= globals.squaresY; y++){
+        var muslimType = Math.floor(Math.random() * 9) + 0;
+        globals.muslimTypes[x][y] = muslimType;
+        globals.context.drawImage(muslims[muslimType], x, y, defaults.celSize, defaults.celSize);
+      }
+    }
+
     $.each(difarr, function(index, value){
       value.on({
         click: function(){
@@ -139,8 +173,8 @@ var core = {
 	var images = new Array();
 	images[0] = new Image();
 	images[0].src = defaults.mineImg;
-	images[1] = new Image();
-	images[1].src = defaults.flagImg;
+  images[1] = new Image();
+  images[1].src = defaults.flagImg;
     
     // Initialize the board
     core.setup();
@@ -190,15 +224,14 @@ var core = {
     // Clear certain containers
     containers.flags.html('');
     containers.mines.html('');
-    containers.status.html('Game on :)');
+    containers.status.html('Terrorelhárítást elkezdeni!');
     containers.time.html('0');
-    containers.msg.html('Click on a square to start the game!');
+    containers.msg.html('Kattints egy muszlimra a küldetés megkezdéséhez!');
     
     // Initialize the board
     core.setup();
     
     window.clearInterval(globals.currentAnimation);
-    animation.walker();
   },
   
   /* ------------------------------------------- */
@@ -284,7 +317,7 @@ var action = {
         }while(globals.mineMap[x][y] === -1);
         
         // Set number of mines
-        containers.mines.html('You have to find ' + globals.totalMines + ' mines to win.');
+        containers.mines.html('Még ' + globals.totalMines + ' terroristát kell likvidálni a teljes biztonság eléréséhez.');
         globals.firstClick = false;
       }
       
@@ -389,7 +422,7 @@ var action = {
 					squareFade = setInterval(function(){
 						globals.context.strokeStyle = 'white';
 						globals.context.fillStyle = 'rgba(255,255,255,' + alpha + ')';
-						util.roundRect(x, y);
+						util.roundRect(x, y, true);
 							
 						if(globals.mineMap[x][y] !== -1){
 					
@@ -440,7 +473,8 @@ var action = {
   // -- Used to flag a square
   // -- @return void
   /* ------------------------------------------- */
-  
+
+
   flag: function(flag, x, y){
     
     // If square is not already flagged
@@ -472,8 +506,8 @@ var action = {
     }
     
     // Adjust counters accordingly
-    containers.mines.html('You have to find ' + (globals.totalMines - globals.totalFlags) + ' mines to win.');
-    containers.flags.html('You have set ' + globals.totalFlags + ' flags.');
+    containers.mines.html('Még ' + (globals.totalMines - globals.totalFlags) + ' terrorista bujkál.');
+    containers.flags.html('Még ' + globals.totalFlags + ' terroristát kell likvidálásra jelölnöd.');
     
     // With every flag (or unflag) check if the game has been won
     action.won();
@@ -503,7 +537,7 @@ var action = {
     if(count === globals.totalMines){
       // Set game over status
       globals.gameover = true;
-      containers.status.html('You won! :D');
+      containers.status.html('Köszönjük hogy megóvtad a tisztességes állampolgárokat! Egy hős vagy!');
       
       scores.save();
       
@@ -608,8 +642,8 @@ var action = {
     
     // Set game over status
     globals.gameover = true;
-    containers.status.html('Game over :(');
-    containers.msg.html('Click the reset button to start a new game');
+    containers.status.html('Allahu Akbar!');
+    containers.msg.html('Ezt elbaltáztad. Gyorsan hiúsíts meg egy másik terrorakciót!');
     
     // Stops the timer and counts down to a reset of the game
     window.clearInterval(globals.clock);
@@ -632,7 +666,7 @@ var scores = {
       
         var lScores = JSON.parse(localStorage.scores);
         
-        containers.scoreboard.html('<tr><th>Name</th><th>Mines</th><th>Seconds</th></tr>');
+        containers.scoreboard.html('<tr><th>Név</th><th>Terroristák</th><th>Másodperc</th></tr>');
         
         $.each(lScores, function(){
           containers.scoreboard.append('<tr><td>' + this[0] + '</td><td>' + this[2] + '</td><td>' + this[3] + '</td></tr>');  
@@ -640,7 +674,7 @@ var scores = {
       
       }else{
         
-        containers.scoreboard.html('<tr><td>You have not won any games yet :(</td></tr>');
+        containers.scoreboard.html('<tr><td>Egyetlen sikeres küldetésed sem volt! Reméljük nem árulod el saját hazád a "tolerancia" jegyében!</td></tr>');
       }
     
     }else{
@@ -653,8 +687,8 @@ var scores = {
     
     if(typeof Storage !== 'undefined'){
       
-      var name = prompt('Your score is being stored. Please enter your name','Name'),
-        score = [name, 'Insane', globals.totalMines, globals.elapsedTime, 10000];
+      var name = prompt('Hős tetted nem merül feledésbe. Ezentúl hogy szólítsunk?','A dicsőségre méltó név'),
+        score = [name, 'Őrületes', globals.totalMines, globals.elapsedTime, 10000];
 
       var scores = (typeof localStorage.scores !== 'undefined') ? JSON.parse(localStorage.scores) : new Array();
       
@@ -682,26 +716,7 @@ var animation = {
     }
   },
   
-  walker: function(){
-    // Make sure proper styles are set
-    globals.context.strokeStyle = defaults.celStroke;
-    
-    var x = 0, y = 0;
-    globals.currentAnimation = setInterval(function(){
-      
-      animation.standardBoard();
-      
-      globals.context.fillStyle = '#f16529';
-      util.roundRect(x, y);
-      
-      x++;
-      
-      if(x === globals.squaresX){ x = 0; y++; }
-      
-      if(y === globals.squaresY){ x = 0; y = 0; }
-    
-    }, 30);
-  }, 
+
   
   topDown: function(){
     // Make sure proper styles are set
@@ -821,13 +836,16 @@ var util = {
   // -- Draws rounded rectangles
   /* ------------------------------------------- */
   
-  roundRect: function(x, y){
-		
+  roundRect: function(x, y, dontDrawMuslim){console.log(x + '-'+y);
+  console.log(globals.squaresX);
+  console.log(globals.squaresY);
+    var muslim = muslims[globals.muslimTypes[x][y]];
+
 		var width = defaults.celSize - 1,
 				height = defaults.celSize - 1,
 				x = x * defaults.celSize,
 				y = y * defaults.celSize;
-		
+
     globals.context.beginPath();
     globals.context.moveTo(x + defaults.celRadius, y);
     globals.context.lineTo(x + width - defaults.celRadius, y);
@@ -840,7 +858,11 @@ var util = {
     globals.context.quadraticCurveTo(x, y, x + defaults.celRadius, y);
     globals.context.closePath();
     globals.context.stroke();
-    globals.context.fill();    
+    globals.context.fill();
+
+    if (!dontDrawMuslim) {
+      $('#board')[0].getContext("2d").drawImage(muslim, x, y, 40, 40);
+    }
   },
   
   /* ------------------------------------------- */
