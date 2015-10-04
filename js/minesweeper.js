@@ -224,7 +224,7 @@ var core = {
     // Clear certain containers
     containers.flags.html('');
     containers.mines.html('');
-    containers.status.html('Terrorelhárítást elkezdeni!');
+    containers.status.html('Terrorelhárítást megkezdeni!');
     containers.time.html('0');
     containers.msg.html('Kattints egy muszlimra a küldetés megkezdéséhez!');
     
